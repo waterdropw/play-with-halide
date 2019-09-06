@@ -19,32 +19,29 @@ Build Status
 [2]: https://travis-ci.org/xbwee1024/play-with-halide
 
 ### Prerequisites
-**Ninja** installed
-
-For Unix-like systems,
-**gcc** or **clang** installed
-
-For windows,
-**Visual Studio** installed
+`Ninja`, `gcc` or `lang` installed
 
 For Android,
-**Android NDK** installed. **Android SDK** is not required now (build Android examples is disabled)
+`Android NDK` installed. `Android SDK` is not required now (build Android examples is disabled)
+
+### Clone the source code
+```bash
+git clone https://github.com/xbwee1024/play-with-halide.git
+cd play-with-halide
+git submodule update --init --recursive
+# or clone with --recursive
+git clone https://github.com/xbwee1024/play-with-halide.git --recursive
+```
 
 ### Build Halide
-For Unix-like systems, 
+
 ```bash
 ./script/build-halide.sh
 # or add android to cross-compile Android
 ./script/build-halide.sh android
 ```
-this will build the **Halide** library and install into /usr/local/
+this will build the `Halide` library and install into /usr/local/
 
-For windows,
-```bash
-.\script\build-halide.bat
-# or add android to cross-compile Android
-.\script\build-halide.bat android
-```
 
 ### Build Project
 

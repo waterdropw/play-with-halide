@@ -1,5 +1,7 @@
 # Intermediate files
 /out
+/.vscode
+/.idea
 
 .DS_Store
 /.DS_Store
