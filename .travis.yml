@@ -3,7 +3,7 @@ sudo: required
 language:
   - cpp
 compiler:
-  - clang
+  - gcc
 env:
     global:
     - LLVM_VERSION=8.0.0
