@@ -19,7 +19,7 @@ Build Status
 [2]: https://travis-ci.org/xbwee1024/play-with-halide
 
 ### Prerequisites
-`Ninja`, `gcc` or `lang` installed
+`Ninja`, `gcc` or `clang` installed
 
 For Android,
 `Android NDK` installed. `Android SDK` is not required now (build Android examples is disabled)
