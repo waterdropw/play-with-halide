@@ -40,11 +40,15 @@ git clone https://github.com/xbwee1024/play-with-halide.git --recursive
 # or add android to cross-compile Android
 ./script/build-halide.sh android
 ```
-this will build the `Halide` library and install into /usr/local/
+this will build the `Halide` library and install it into `out/halide/distrib/${HOST_NAME}`
 
 
 ### Build Project
 
-The build procedure is simple, just run `build.sh` or `build.bat` for Windows:
+```bash
+./script/build.sh
+# or add android to cross-compile Android
+./script/build.sh android
+```
 
-When building finished, binaries will be stay in `out/install/bin`
+When building finished, binaries will be installed at `out/install/${HOST_NAME}/bin`
