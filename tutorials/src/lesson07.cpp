@@ -8,6 +8,9 @@
 #include "Halide.h"
 #include "halide_image_io.h"
 
+#define LOG_TAG "lesson7"
+#include "utils.h"
+
 
 using namespace Halide;
 using namespace Halide::Tools;
@@ -19,6 +22,8 @@ int main(int argc, char** argv) {
     // Now we'll express a multi-stage pipeline that blurs an image
     // first horizontally, and then vertically.
     {
+        logd("blur-with-no-boundary");
+
         Buffer<uint8_t> input = load_image("images/rgb.png");
         Func input_16("input_16");
         input_16(x, y, c) = cast<uint16_t>(input(x, y, c));
@@ -41,12 +46,12 @@ int main(int argc, char** argv) {
         // parrot, and it should be two pixels narrower and two pixels
         // shorter than the input image.
         save_image(result, "blurry_parrot_1.png");
-
-        printf("=======================================\n\n\n");
     }
 
     // The same pipeline, with a boundary condition on the input.
     {
+        logd("blur-with-boundary");
+
         Buffer<uint8_t> input = load_image("images/rgb.png");
 
         Func clamped("clamped");
@@ -76,10 +81,7 @@ int main(int argc, char** argv) {
         // shorter than the input image.
         save_image(result, "blurry_parrot_2.png");
 
-        printf("=======================================\n\n\n");
     }
 
-
-    printf("Success!\n");
     return 0;
 }

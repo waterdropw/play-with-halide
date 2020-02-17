@@ -5,6 +5,8 @@
 #include <stdio.h>
 
 #include "Halide.h"
+#define LOG_TAG "lesson10"
+#include "utils.h"
 
 using namespace Halide;
 
@@ -22,7 +24,7 @@ int main(int argc, char** argv) {
 
     brighten.compile_to_static_library("lesson10_halide", {input, offset}, "brighten");
 
-    printf("Halide pipeline compiled, but not yet run.\n");
+    logd("Halide pipeline compiled, but not yet run.\n");
 
     return 0;
 }

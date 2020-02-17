@@ -2,62 +2,116 @@
  * Copyright 2019 Xiaobin Wei <xiaobin.wee@gmail.com>
  */
 
-#include <chrono>
+#include <stdarg.h>
+#include <string>
 
+#include "os.h"
 #include "utils.h"
 
+namespace utils {
+namespace io {
 
-// Prefer high_resolution_clock, but only if it's steady...
-template <bool HighResIsSteady = std::chrono::high_resolution_clock::is_steady>
-struct SteadyClock {
-    using type = std::chrono::high_resolution_clock;
-};
+// Used to control enable/disable which one to be printed out
+LogLevel gMinLogLevel = LogLevel::DEBUG;
 
-// ...otherwise use steady_clock.
-template <>
-struct SteadyClock<false> {
-    using type = std::chrono::steady_clock;
-};
+int readFile(char const *ifname, char **buf) {
+    if (buf == nullptr) return 0;
+    FILE *fp = fopen(ifname, "rb");
 
-inline SteadyClock<>::type::time_point benchmark_now() {
-    return SteadyClock<>::type::now();
-}
+    if (fp == nullptr) printf("Cannot open file: %s\n", ifname);
 
-inline double benchmark_duration_seconds(
-        SteadyClock<>::type::time_point start,
-        SteadyClock<>::type::time_point end) {
-    return std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
-}
-
-static SteadyClock<>::type::time_point kStart;
-
-ScopeTimer::ScopeTimer(const char *name) {
-    mFinished = true;
-
-    reset(name);
-}
-
-ScopeTimer::~ScopeTimer() {
-    if (!mFinished) {
-        finish();
+    fseek(fp, 0, SEEK_END);
+    int size = ftell(fp);
+    if (buf != nullptr) {
+        fseek(fp, 0, SEEK_SET);
+        *buf = new char[size];
+        fread(*buf, size, 1, fp);
     }
+    fclose(fp);
+
+    return size;
 }
 
-void ScopeTimer::finish() {
-    mFinished = true;
-    double best = std::numeric_limits<double>::infinity();
-    auto end = benchmark_now();
-    double elapsed_seconds = benchmark_duration_seconds(kStart, end);
-    best = std::min(best, elapsed_seconds);
-    printf("leave %s %.3fms\n", mName.c_str(), best*1000);
+void writeFile(char const *ofname, char *buf, size_t size) {
+    if (buf == nullptr) return;
+
+    FILE *fp = fopen(ofname, "wb");
+    if (fp == nullptr) printf("Cannot open file: %s\n", ofname);
+    fwrite(buf, size, 1, fp);
+    fclose(fp);
 }
 
-void ScopeTimer::reset(const char *name) {
-    if (!mFinished) {
-        finish();
+static std::string svsprintf(const char *fmt, va_list ap_orig) {
+    int size = 1023;
+    char *p;
+
+    if ((p = (char *)malloc(size)) == nullptr) goto err;
+
+    for (;;) {
+        va_list ap;
+        va_copy(ap, ap_orig);
+        int n = vsnprintf(p, size, fmt, ap);
+        va_end(ap);
+
+        if (n < 0) goto err;
+
+        if (n < size) {
+            std::string rst(p);
+            free(p);
+            return rst;
+        }
+
+        size = n + 1;
+
+        char *np = (char *)realloc(p, size);
+        if (!np) {
+            free(p);
+            goto err;
+        } else {
+            p = np;
+        }
     }
-    mName = name;
-    mFinished = false;
-    kStart = benchmark_now();
-    printf("enter %s\n", mName.c_str());
+
+err:
+    fprintf(stderr, "cannot allocate memory for svsprintf; fmt=%s\n", fmt);
+#ifndef _WINDOWS_PLATFORM_
+    __builtin_trap();
+#else
+    abort();
+#endif  // !_MEG_WINDOWS_PLATFORM_
 }
+
+void _log_print(LogLevel ll, const char *tag, const char *fmt, ...) {
+    const char *LL_STR = nullptr;
+
+    if (ll < gMinLogLevel || ll > LogLevel::ERROR) return;
+
+    switch (ll) {
+        case LogLevel::DEBUG:
+            LL_STR = "[DEBUG] ";
+            break;
+        case LogLevel::WARN:
+            LL_STR = "[WARN] ";
+            break;
+        case LogLevel::ERROR:
+            LL_STR = "[ERROR] ";
+            break;
+        default:
+            LL_STR = "";
+    }
+    va_list ap;
+    va_start(ap, fmt);
+    auto msg = svsprintf(fmt, ap);
+    va_end(ap);
+    std::string tag_str = "[";
+    tag_str += tag;
+    tag_str += "]";
+    std::string message(tag_str);
+    message += LL_STR;
+    message += msg;
+
+    os::Printer::print(message.c_str());
+}
+
+}  // namespace io
+}  // namespace utils

@@ -5,6 +5,8 @@
 #include <stdio.h>
 
 #include "Halide.h"
+#define LOG_TAG "lesson8"
+#include "utils.h"
 
 using namespace Halide;
 
@@ -21,7 +23,7 @@ int main(int argc, char** argv) {
             producer(x+1, y) + producer(x+1, y+1)) / 4;
         producer.trace_stores();
         consumer.trace_stores();
-        printf("\nEvaluating producer-consumer pipeline with default schedule\n");
+        logd("\nEvaluating producer-consumer pipeline with default schedule\n");
         consumer.realize(4, 4);
 
         // The equivalent C code is:
@@ -34,7 +36,7 @@ int main(int argc, char** argv) {
                                 sin((x+1)*(y+1)))/4;
             }
         }
-        printf("\nPseudo-code for the schedule:\n");
+        logd("\nPseudo-code for the schedule:\n");
         consumer.print_loop_nest();
     }
 
@@ -53,7 +55,7 @@ int main(int argc, char** argv) {
         producer.trace_stores();
         consumer.trace_stores();
 
-        printf("\n\nEvaluating producer.compute_root()\n");
+        logd("\n\nEvaluating producer.compute_root()\n");
         consumer.realize(4, 4);
 
         // The equivalent C code is:
@@ -75,7 +77,7 @@ int main(int argc, char** argv) {
                                 producer_storage[y+1][x+1])/4;
             }
         }
-        printf("\nPseudo-code for the schedule:\n");
+        logd("\nPseudo-code for the schedule:\n");
         consumer.print_loop_nest();
     }
 
@@ -95,7 +97,7 @@ int main(int argc, char** argv) {
         producer.trace_stores();
         consumer.trace_stores();
 
-        printf("\n\nEvaluating producer.compute_at(consumer, y)\n");
+        logd("\n\nEvaluating producer.compute_at(consumer, y)\n");
         consumer.realize(4, 4);
 
         float result[4][4];
@@ -122,7 +124,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        printf("\nPseudo-code for the schedule:\n");
+        logd("\nPseudo-code for the schedule:\n");
         consumer.print_loop_nest();
     }
 
@@ -147,7 +149,7 @@ int main(int argc, char** argv) {
         producer.trace_stores();
         consumer.trace_stores();
 
-        printf("\n\nEvaluating producer.store_root().compute_at(consumer, y)\n");
+        logd("\n\nEvaluating producer.store_root().compute_at(consumer, y)\n");
         consumer.realize(4, 4);
 
         float result[4][4];
@@ -180,7 +182,7 @@ int main(int argc, char** argv) {
                                 producer_storage[(y+1) & 1][x+1])/4;
             }
 
-            printf("\nPseudo-code for the schedule:\n");
+            logd("\nPseudo-code for the schedule:\n");
             consumer.print_loop_nest();
         }
     }
@@ -201,7 +203,7 @@ int main(int argc, char** argv) {
         producer.trace_stores();
         consumer.trace_stores();
 
-        printf("\n\nEvaluating producer.store_root().compute_at(consumer, x)\n");
+        logd("\n\nEvaluating producer.store_root().compute_at(consumer, x)\n");
         consumer.realize(4, 4);
 
         float result[4][4];
@@ -233,7 +235,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        printf("\nPseudo-code for the schedule:\n");
+        logd("\nPseudo-code for the schedule:\n");
         consumer.print_loop_nest();
     }
 
@@ -266,7 +268,7 @@ int main(int argc, char** argv) {
         // Turn on tracing.
         producer.trace_stores();
         consumer.trace_stores();
-        printf("\n\nEvaluating:\n"
+        logd("\n\nEvaluating:\n"
             "consumer.tile(x, y, x_outer, y_outer, x_inner, y_inner, 4, 4);\n"
             "producer.compute_at(consumer, x_outer);\n");
         consumer.realize(8, 8);
@@ -303,7 +305,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        printf("Pseudo-code for the schedule:\n");
+        logd("Pseudo-code for the schedule:\n");
         consumer.print_loop_nest();
     }
 
@@ -330,7 +332,7 @@ int main(int argc, char** argv) {
         // consumer.trace_stores();
         // producer.trace_stores();
 
-        printf("\n\nEvaluating producer_mixed, consumer_mixed\n");
+        logd("\n\nEvaluating producer_mixed, consumer_mixed\n");
         Buffer<float> halide_result = consumer.realize(160, 160);
 
         // Here's the equivalent (serial) C:
@@ -404,7 +406,7 @@ int main(int argc, char** argv) {
 
             }
         }
-        printf("\nPseudo-code for the schedule:\n");
+        logd("\nPseudo-code for the schedule:\n");
         consumer.print_loop_nest();
 
         // Let's check the C result against the Halide result. Doing
@@ -415,7 +417,7 @@ int main(int argc, char** argv) {
                 float error = halide_result(x, y) - c_result[y][x];
                 // It's floating-point math, so we'll allow some slop:
                 if (error < -0.001f || error > 0.001f) {
-                    printf("halide_result(%d, %d) = %f instead of %f\n",
+                    logd("halide_result(%d, %d) = %f instead of %f\n",
                            x, y, halide_result(x, y), c_result[y][x]);
                     return -1;
                 }
@@ -423,6 +425,5 @@ int main(int argc, char** argv) {
         }
     }
 
-    printf("Success!\n");
     return 0;
 }

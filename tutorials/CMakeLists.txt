@@ -9,7 +9,7 @@ find_package(JPEG REQUIRED)
 ##############################################
 # lesson01
 add_executable(lesson01 src/lesson01.cpp)
-target_link_libraries(lesson01 PRIVATE Halide::Halide)
+target_link_libraries(lesson01 PRIVATE Halide::Halide COMMON::utils)
 
 ##############################################
 # lesson02
@@ -18,24 +18,30 @@ target_compile_definitions(lesson02 PRIVATE ${PNG_DEFINITIONS})
 target_compile_definitions(lesson02 PRIVATE ${JPEG_DEFINITIONS})
 target_include_directories(lesson02 PRIVATE ${PNG_INCLUDE_DIRS})
 target_include_directories(lesson02 PRIVATE ${JPEG_INCLUDE_DIRS})
-target_link_libraries(lesson02 PRIVATE Halide::Halide ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
+target_link_libraries(lesson02
+    PRIVATE 
+        Halide::Halide 
+        COMMON::utils
+        ${PNG_LIBRARIES} 
+        ${JPEG_LIBRARIES}
+)
 
 # cmake_print_variables(PNG_INCLUDE_DIRS)
 
 ##############################################
 # lesson03
 add_executable(lesson03 src/lesson03.cpp)
-target_link_libraries(lesson03 PRIVATE Halide::Halide)
+target_link_libraries(lesson03 PRIVATE Halide::Halide COMMON::utils)
 
 ##############################################
 # lesson04
 add_executable(lesson04 src/lesson04.cpp)
-target_link_libraries(lesson04 PRIVATE Halide::Halide Halide::utils)
+target_link_libraries(lesson04 PRIVATE Halide::Halide COMMON::utils)
 
 ##############################################
 # lesson05
 add_executable(lesson05 src/lesson05.cpp)
-target_link_libraries(lesson05 PRIVATE Halide::Halide Halide::utils)
+target_link_libraries(lesson05 PRIVATE Halide::Halide COMMON::utils)
 
 
 ##############################################
@@ -48,7 +54,7 @@ target_include_directories(lesson05-perf PRIVATE ${JPEG_INCLUDE_DIRS})
 target_link_libraries(lesson05-perf
     PRIVATE
         Halide::Halide
-        Halide::utils 
+        COMMON::utils 
         ${PNG_LIBRARIES}
         ${JPEG_LIBRARIES}
 )
@@ -56,7 +62,7 @@ target_link_libraries(lesson05-perf
 ##############################################
 # lesson06
 add_executable(lesson06 src/lesson06.cpp)
-target_link_libraries(lesson06 PRIVATE Halide::Halide)
+target_link_libraries(lesson06 PRIVATE Halide::Halide COMMON::utils)
 
 
 ##############################################
@@ -66,18 +72,24 @@ target_compile_definitions(lesson07 PRIVATE ${PNG_DEFINITIONS})
 target_compile_definitions(lesson07 PRIVATE ${JPEG_DEFINITIONS})
 target_include_directories(lesson07 PRIVATE ${PNG_INCLUDE_DIRS})
 target_include_directories(lesson07 PRIVATE ${JPEG_INCLUDE_DIRS})
-target_link_libraries(lesson07 PRIVATE Halide::Halide ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
+target_link_libraries(lesson07
+    PRIVATE 
+        Halide::Halide 
+        COMMON::utils
+        ${PNG_LIBRARIES} 
+        ${JPEG_LIBRARIES}
+)
 
 ##############################################
 # lesson08
 add_executable(lesson08 src/lesson08.cpp)
-target_link_libraries(lesson08 PRIVATE Halide::Halide)
+target_link_libraries(lesson08 PRIVATE Halide::Halide COMMON::utils)
 
 
 ##############################################
 # lesson10
 add_executable(lesson10_run src/lesson10_generate.cpp)
-target_link_libraries(lesson10_run PRIVATE Halide::Halide)
+target_link_libraries(lesson10_run PRIVATE Halide::Halide COMMON::utils)
 
 # add_custom_command(
 #     TARGET lesson10_run
@@ -105,7 +117,8 @@ target_include_directories(lesson10 PRIVATE ${JPEG_INCLUDE_DIRS})
 target_include_directories(lesson10 PRIVATE ${CMAKE_CURRENT_BINARY_DIR})    # generated files
 target_link_libraries(lesson10
     PRIVATE
-        Halide::Halide 
+        Halide::Halide
+        COMMON::utils
         ${PNG_LIBRARIES} 
         ${JPEG_LIBRARIES}
         lesson10_halide
@@ -159,11 +172,11 @@ add_library(brighten_specialized INTERFACE)
 target_include_directories(brighten_specialized INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(brighten_specialized INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/brighten_specialized.a ${CMAKE_DL_LIBS})
 
-add_executable(lesson16 src/lesson16_image.cpp)
+add_executable(lesson16 src/lesson16.cpp)
 target_link_libraries(lesson16
     PRIVATE
         Halide::Halide
-        Halide::utils
+        COMMON::utils
         brighten_planar
         brighten_interleaved
         brighten_either

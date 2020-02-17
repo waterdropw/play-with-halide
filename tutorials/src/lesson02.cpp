@@ -6,6 +6,8 @@
 
 #include "Halide.h"
 #include "halide_image_io.h"
+#define LOG_TAG "lesson2"
+#include "utils.h"
 
 
 int main(int argc, char** argv) {
@@ -26,6 +28,5 @@ int main(int argc, char** argv) {
 
     Halide::Tools::save_image(output, "brighten.png");
 
-    printf("Success!\n");
     return 0;
 }

@@ -5,6 +5,8 @@
 #include <stdio.h>
 
 #include "Halide.h"
+#define LOG_TAG "lesson3"
+#include "utils.h"
 
 
 int main(int argc, char** argv) {
@@ -18,6 +20,5 @@ int main(int argc, char** argv) {
 
     gradient.compile_to_lowered_stmt("gradient.html", {}, Halide::HTML);
 
-    printf("Success!\n");
     return 0;
 }

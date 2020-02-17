@@ -5,59 +5,46 @@
 #include <stdio.h>
 #include <algorithm>
 
-#include "utils.h"
-
 #include "Halide.h"
 #include "halide_image_io.h"
+
+#define LOG_TAG "lesson5"
 #include "utils.h"
 
 
 using namespace Halide;
 using namespace Halide::Tools;
-
+using namespace utils::perf;
 
 int main(int argc, char** argv) {
     Var x("x"), y("y"), c("c");
 
     Buffer<uint8_t> input = load_image("images/rgb.png");
 
+    Timer timer;
     // default ordering
     {
-        ScopeTimer t("row-major");
         Func brighten;
         brighten(x, y, c) = cast<uint8_t>(min(input(x, y, c) * 1.5f, 255));
         Buffer<uint8_t> outimg = brighten.realize(input.width(), input.height(),
             input.channels());
+        logd("row-major jit: %.2f ms", timer.get_msecs_reset());
         save_image(outimg, "row-major.png");
-
-        printf("=======================================\n\n\n");
     }
-    // default ordering
-    {
-        ScopeTimer t("row-major");
-        Func brighten;
-        brighten(x, y, c) = cast<uint8_t>(min(input(x, y, c) * 1.5f, 255));
-        Buffer<uint8_t> outimg = brighten.realize(input.width(), input.height(),
-            input.channels());
-        save_image(outimg, "row-major.png");
 
-        printf("=======================================\n\n\n");
-    }
     // Reorder variables
     {
-        ScopeTimer t("col-major");
         Func brighten;
         brighten(x, y, c) = cast<uint8_t>(min(input(x, y, c) * 1.5f, 255));
         brighten.reorder(y, x, c);
         Buffer<uint8_t> outimg = brighten.realize(input.width(), input.height(),
             input.channels());
+        
+        logd("col-major jit: %.2f ms", timer.get_msecs_reset());
         save_image(outimg, "col-major.png");
-
-        printf("=======================================\n\n\n");
     }
     // tiles & vectorize
     {
-        ScopeTimer t("tile_vectorize");
         Var x_outer, y_outer, x_inner, y_inner;
         Func brighten;
         brighten(x, y, c) = cast<uint8_t>(min(input(x, y, c) * 1.5f, 255));
@@ -65,13 +52,12 @@ int main(int argc, char** argv) {
         // brighten.vectorize(x_inner);
         Buffer<uint8_t> outimg = brighten.realize(input.width(), input.height(),
             input.channels());
+        
+        logd("tiled_vectorized jit: %.2f ms", timer.get_msecs_reset());
         save_image(outimg, "tiled_vectorized.png");
-
-        printf("=======================================\n\n\n");
     }
     // fusing, tiled and parallel
     {
-        ScopeTimer t("tile_fuse_parallel");
         Var x_outer, y_outer, x_inner, y_inner, tile_index;
         Func brighten;
         brighten(x, y, c) = cast<uint8_t>(min(input(x, y, c) * 1.5f, 255));
@@ -82,13 +68,12 @@ int main(int argc, char** argv) {
 
         Buffer<uint8_t> outimg = brighten.realize(input.width(), input.height(),
             input.channels());
+        
+        logd("tile_fuse_parallel jit: %.2f ms", timer.get_msecs_reset());
         save_image(outimg, "tile_fuse_parallel.png");
-
-        printf("=======================================\n\n\n");
     }
     // all togather
     {
-        ScopeTimer t("all_togather");
         Var x_outer, y_outer, x_inner, y_inner, tile_index;
         Func brighten;
         brighten(x, y, c) = cast<uint8_t>(min(input(x, y, c) * 1.5f, 255));
@@ -103,11 +88,10 @@ int main(int argc, char** argv) {
 
         Buffer<uint8_t> outimg = brighten.realize(input.width(), input.height(),
             input.channels());
-        save_image(outimg, "all_togather.png");
 
-        printf("=======================================\n\n\n");
+        logd("all_togather jit: %.2f ms", timer.get_msecs_reset());
+        save_image(outimg, "all_togather.png");
     }
 
-    printf("Success!\n");
     return 0;
 }

@@ -9,6 +9,9 @@
 
 #include "halide_image_io.h"
 
+#define LOG_TAG "lesson10"
+#include "utils.h"
+
 
 int main(int argc, char** argv) {
 
@@ -22,7 +25,7 @@ int main(int argc, char** argv) {
     int offset = 5;
     int error = brighten(input, offset, output);
     if (error) {
-        printf("Halide returned an error: %d\n", error);
+        logd("Halide returned an error: %d\n", error);
         return -1;
     }
 
@@ -32,13 +35,12 @@ int main(int argc, char** argv) {
             uint8_t output_val = output(x, y);
             uint8_t correct_val = input_val + offset;
             if (output_val != correct_val) {
-                printf("output(%d, %d) was %d instead of %d\n",
+                logd("output(%d, %d) was %d instead of %d\n",
                        x, y, output_val, correct_val);
                 return -1;
             }
         }
     }
 
-    printf("Success!\n");
     return 0;
 }

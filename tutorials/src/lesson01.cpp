@@ -5,6 +5,8 @@
 #include <stdio.h>
 
 #include "Halide.h"
+#define LOG_TAG "lesson1"
+#include "utils.h"
 
 
 int main(int argc, char** argv) {
@@ -19,13 +21,12 @@ int main(int argc, char** argv) {
     for (int j = 0; j < output.height(); j++) {
         for (int i = 0; i < output.width(); i++) {
             if (output(i, j) != i+j) {
-                printf("Something went wrong!\n"
+                logd("Something went wrong!\n"
                     "Pixel (%d,%d) was supposed to be %d, but it's %d\n",
                     i, j, i+j, output(i, j));
                 return -1;
             }
         }
     }
-    printf("Success!\n");
     return 0;
 }
