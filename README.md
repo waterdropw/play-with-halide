@@ -19,7 +19,7 @@ Build Status
 [2]: https://travis-ci.org/xbwee1024/play-with-halide
 
 ### Prerequisites
-`Ninja`, `gcc` or `clang` installed
+`Ninja`, `llvm` and `cmake` installed
 
 For Android,
 `Android NDK` installed. `Android SDK` is not required now (build Android examples is disabled)
@@ -36,6 +36,7 @@ git clone https://github.com/xbwee1024/play-with-halide.git --recursive
 ### Build Halide
 
 ```bash
+export LLVM_DIR=your_path_of_llvm_cmake_dir (such as /usr/local/opt/llvm/lib/cmake/llvm)
 ./script/build-halide.sh
 # or add android to cross-compile Android
 ./script/build-halide.sh android
