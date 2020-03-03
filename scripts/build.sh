@@ -35,15 +35,28 @@ echo "Build Dir: ${BUILD_ROOT}"
 echo "Install Dir: ${INSTALL_DIR}"
 echo "*** *** *** *** *** *** *** *** *** *** *** ***"
 
+
 if [[ ${TARGET_OS} == "Android" ]]; then
-    ANDROID_NDK=`echo $ANDROID_NDK`
-    ANDROID_SDK=`echo $ANDROID_SDK`
+    if [[ -d "$ANDROID_NDK" ]]; then
+        echo "ANDROID_NDK=$ANDROID_NDK"
+    elif [[ -d "$ANDROID_NDK_ROOT" ]]; then
+        ANDROID_NDK=$ANDROID_NDK_ROOT
+    elif [[ -d "$ANDROID_HOME" ]]; then
+        ANDROID_NDK=$ANDROID_HOME/ndk-bundle
+    fi
+    
+    if [[ -d "$ANDROID_SDK" ]]; then
+        echo "ANDROID_SDK=$ANDROID_SDK"
+    elif [[ -d "$ANDROID_HOME" ]]; then
+        ANDROID_SDK=$ANDROID_HOME
+    fi
+
     if [[ ! -e "${ANDROID_NDK}" ]]; then
-        echo "Error: ANDROID_NDK is not set"
+        echo "Error: ANDROID_NDK is not fuond"
         exit
     fi
     if [[ ! -e "${ANDROID_SDK}" ]]; then
-        echo "Error: ANDROID_SDK is not set"
+        echo "Error: ANDROID_SDK is not found"
         exit
     fi
 fi
