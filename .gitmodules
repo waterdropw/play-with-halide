@@ -1,3 +1,6 @@
 [submodule "external/Halide"]
 	path = external/Halide
 	url = https://github.com/halide/Halide.git
+[submodule "utils"]
+	path = utils
+	url = https://github.com/xbwee1024/CommonUtils.git
