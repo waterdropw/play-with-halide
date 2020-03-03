@@ -31,9 +31,7 @@ list(APPEND VARIANTS
     lanczos_uint8_down)
 
 add_executable(resize resize.cpp)
-set_target_properties(resize PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES CXX_EXTENSIONS NO)
-target_include_directories(resize PRIVATE "${HALIDE_INCLUDE_DIR}" "${HALIDE_TOOLS_DIR}")
-halide_use_image_io(resize)
+target_link_libraries(resize PRIVATE Halide::ImageIO Halide::Halide)
 
 halide_generator(resize.generator SRCS resize_generator.cpp)
 foreach(VARIANT ${VARIANTS})
@@ -50,7 +48,7 @@ foreach(VARIANT ${VARIANTS})
 endforeach()
 
 # Make the small input used to test upsampling with our highest-quality downsampling method
-set(RGBORIG "${CMAKE_CURRENT_SOURCE_DIR}/../../images/rgb.png")
+set(RGBORIG "${CMAKE_CURRENT_SOURCE_DIR}/../images/rgb.png")
 set(RGBSMALL "${CMAKE_BINARY_DIR}/rgb_small.png")
 add_custom_command(
     OUTPUT "${RGBSMALL}"
