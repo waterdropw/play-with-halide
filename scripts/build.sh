@@ -5,11 +5,16 @@ HOST=`uname -sm`
 TARGET_OS=$1
 HOST_SYSTEM=`uname`
 CPU_CORES=4
+
+SRC_DIR=`pwd`
+ABI_DIR=x64-Release
+
 if [[ -z ${TARGET_OS} ]]; then
     TARGET_OS=${HOST_SYSTEM}
 fi
 if [[ ${TARGET_OS} == "Android" || ${TARGET_OS} == "android" ]]; then
     TARGET_OS="Android"
+    ABI_DIR=$ANDROID_ABI
 fi
 
 if [[ ${HOST_SYSTEM} == "Linux" ]]; then
@@ -18,21 +23,35 @@ elif [[ ${HOST_SYSTEM} == "Darwin" ]]; then
     CPU_CORES=`sysctl -n hw.physicalcpu`
 fi
 
-if [[ ! -e "${HALIDE_DISTRIB_DIR}" ]]; then
-    export HALIDE_DISTRIB_DIR=${CURRENT_DIR}/out/halide/distrib/${TARGET_OS}
+if [[ ! -e "${Halide_DIR}" ]]; then
+    if [[ -e "${HALIDE_ROOT_DIR}" ]]; then
+        echo "Use Halide_DIR=$HALIDE_ROOT_DIR"
+        echo
+        Halide_DIR=`echo $HALIDE_ROOT_DIR`
+    else
+        echo "Use local build target"
+        echo
+        Halide_DIR=$HALIDE_TARGET_DIR/$TARGET_OS/$ABI_DIR/lib/cmake/Halide
+    fi
+    if [[ ! -e "${Halide_DIR}" ]]; then
+        echo "Error: Halide_DIR=$Halide_DIR DOES NOT exist"
+        exit
+    fi
 fi
 
-INSTALL_DIR=out/install/${TARGET_OS}
-BUILD_ROOT=out/build
+INSTALL_ROOT=out/install/${TARGET_OS}
+BUILD_ROOT=out/build/${TARGET_OS}
+# HALIDE_TARGET_DIR=out/Halide/distrib
+
 
 echo "*** *** *** *** *** *** *** *** *** *** *** ***"
-echo "HALIDE_DISTRIB_DIR: ${HALIDE_DISTRIB_DIR}"
+echo "Halide_DIR: ${Halide_DIR}"
 echo "HOST_OS: ${HOST}"
 echo "TARGET_OS: ${TARGET_OS}"
 echo "CPU_CORES: ${CPU_CORES}"
 echo "SRC Dir: ${SRC_DIR}"
 echo "Build Dir: ${BUILD_ROOT}"
-echo "Install Dir: ${INSTALL_DIR}"
+echo "Install Dir: ${INSTALL_ROOT}"
 echo "*** *** *** *** *** *** *** *** *** *** *** ***"
 
 
@@ -63,7 +82,9 @@ fi
 
 CMAKE_CONFIG="-G "Ninja" \\
     -D CMAKE_INSTALL_PREFIX=${INSTALL_DIR} \\
-    -D CMAKE_POSITION_INDEPENDENT_CODE=ON"
+    -D CMAKE_BUILD_TYPE=Release \\
+    -D Halide_DIR=${Halide_DIR} \\
+    -D CMAKE_POSITION_INDEPENDENT_CODE=ON "
     
 if [[ ${TARGET_OS} == "Android" ]]; then
     CMAKE_CONFIG="${CMAKE_CONFIG} \\
@@ -86,10 +107,12 @@ if [[ ${TARGET_OS} == "Android" ]]; then
 else
     # Debug vs Release has no difference!!!
     # BUILD_DIR=${BUILD_ROOT}/x64-Debug
-    # cmake ${CMAKE_CONFIG} -S ${SRC_DIR} -B ${BUILD_DIR}
+    # INSTALL_DIR=${INSTALL_ROOT}/x64-Debug
+    # cmake ${CMAKE_CONFIG} -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -B ${BUILD_DIR} .
     # cmake --build ${BUILD_DIR} --config Debug --target install -- -j${CPU_CORES}
 
     BUILD_DIR=${BUILD_ROOT}/x64-Release
-    cmake ${CMAKE_CONFIG} -D CMAKE_INSTALL_PREFIX=${INSTALL_DIR} -B ${BUILD_DIR} .
+    INSTALL_DIR=${INSTALL_ROOT}/x64-Release
+    cmake ${CMAKE_CONFIG} -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -B ${BUILD_DIR} .
     cmake --build ${BUILD_DIR} --config Release --target install -- -j${CPU_CORES}
 fi

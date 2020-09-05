@@ -38,14 +38,19 @@ if(Halide_FOUND AND NOT TARGET Halide::Halide)
     target_compile_features(Halide INTERFACE cxx_std_11)
 
     add_library(Halide::Halide ALIAS Halide)
+
+    # some usefull cmake func/macro
+    include("${HALIDE_ROOT_DIR}/halide.cmake")
+else()
+    include(CMakePrintHelpers)
+    cmake_print_variables(HALIDE_ROOT_DIR)
+    cmake_print_variables(Halide_FOUND)
+    cmake_print_variables(Halide_INCLUDE_DIR)
+    cmake_print_variables(Halide_TOOLS_DIR)
+    cmake_print_variables(Halide_INCLUDE_DIRS)
+    cmake_print_variables(Halide_LIBRARY)
+    cmake_print_variables(Halide_LIBRARIES)
+    cmake_print_variables(Halide_LIBS)
 endif()
 
-include(CMakePrintHelpers)
-cmake_print_variables(HALIDE_ROOT_DIR)
-cmake_print_variables(Halide_FOUND)
-cmake_print_variables(Halide_INCLUDE_DIR)
-cmake_print_variables(Halide_TOOLS_DIR)
-cmake_print_variables(Halide_INCLUDE_DIRS)
-cmake_print_variables(Halide_LIBRARY)
-cmake_print_variables(Halide_LIBRARIES)
-cmake_print_variables(Halide_LIBS)
+
